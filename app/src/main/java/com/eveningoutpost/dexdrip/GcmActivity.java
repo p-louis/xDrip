@@ -516,11 +516,14 @@ public class GcmActivity extends FauxActivity {
         return false;
     }
 
-    public static void sendNanoStatusUpdate(final String prefix, final String json) {
+    // returns true when the update was actually queued for sending
+    public static boolean sendNanoStatusUpdate(final String prefix, final String json) {
         if (JoH.pratelimit("gcm-nscu" + prefix, 30)) {
             UserError.Log.d(TAG, "Sending nano status update: " + prefix + " " + json);
             sendMessage("nscu" + prefix, json);
+            return true;
         }
+        return false;
     }
 
     public static void sendMimeoGraphUpdate(final String json) {
@@ -849,7 +852,7 @@ public class GcmActivity extends FauxActivity {
 
         if (!InstalledApps.isGooglePlayInstalled(xdrip.getAppContext())) {
             if (JoH.pratelimit("gms-missing-msg", 86400)) {
-                final String msg = "Google Play services - not installed!\nInstall it or disable xDrip+ sync options";
+                final String msg = "Google Play services - not installed!\nInstall it or disable xDrip sync options";
                 JoH.static_toast_long(msg);
                 Home.toaststaticnext(msg);
             }
